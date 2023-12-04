@@ -201,6 +201,9 @@ if __name__ == "__main__":
     print (book)
     print (type(book))
     pages_to_print = PrintIterator(book)
+    print (pages_to_print)
+    print (pages_to_print.addr_book)
+    print (pages_to_print.addr_book == book)
     page = 1
     for records_on_page in pages_to_print: #book.data.items():
         print (f'--- Page {page} ---')
