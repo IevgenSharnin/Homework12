@@ -50,6 +50,7 @@ class Record:
         self.name = Name(name)
         self.phones = []
         self.birthday = birthday
+        self.stringets = ''
 
     def add_birthday (self, b_day):
         try:
@@ -112,8 +113,10 @@ class Record:
 
     def __str__(self):
         try:
-            return f"Contact name: {self.name._Field__value}; \
-phones: {', '.join(p.value for p in self.phones)}; birthday: {self.birthday}"
+            self.stringets = f"Contact name: {self.name._Field__value}; \
+#phones: {', '.join(p.value for p in self.phones)}; birthday: {self.birthday}"
+#            return print ('|{:<15}|{:<35}|{:<12}|'.format(self.name._Field__value, ", ".join(p.value for p in self.phones), self.birthday))
+            return self.stringets
         except AttributeError:
             return f"Contact name: {self.name._Field__value}; phones: no phones added; birthday: {self.birthday}"
 # Клас для усієї книжки: 
@@ -126,25 +129,6 @@ class AddressBook(UserDict):
     def add_record (self, record: Record):
         self.data.update ({record.name.value: record})
         print (f"Contact '{record.name.value}' added\n")
-#        print (f'dict from class: {self.data}')
-#        with open ('phonebook.bin', 'ab') as file:
-#            one_record = pickle.dumps (record)
-#            file.write (one_record)
-#            file.write (b'\n')
-#        with open ('phonebook.bin', 'rb') as file:
-#            file_readed = pickle.load (file)
-#            print (f'from pickle: {file_readed}')
-#            print (f'as lines: {file.readlines()}')
-#            file.seek(0)
-#            phonebook_readed = {}
-#            while True:
-#                line_ = file.readline()
-#                line = pickle.loads (line_[:-1])
-#                print (f'line: {line}')
-#                if line:
-#                    phonebook_readed.update (line)
-#                else: break
-#            print (f'as file: {phonebook_readed}')
 
     def find (self, name):
         self.name = Name (name)
@@ -160,7 +144,7 @@ class AddressBook(UserDict):
     def __next__(self):
         if not self.count_for_print:
             while True:
-                number_records_on_page = input ('How many records on page do you want? ')
+                number_records_on_page = input ('How many records on page do you want to print? ')
                 self.number_records_on_page = number_records_on_page
                 if self.number_records_on_page.isdigit():
                     break
@@ -183,14 +167,12 @@ class PrintIterator:
 
 if __name__ == "__main__":
 # Тестово читаємо книжку з телефонами
-    print ("-----Тестово читаємо книжку з телефонами-----")
+    print ("-----Читаємо книжку з телефонами з файлу, якщо він є-----")
     try:
         with open ('phonebook.bin', 'rb') as file:
             book = pickle.load (file)
-
-        print (book)
-        for record in book.values():
-            print (record)
+# Обнуляю каунтер для посторінкового друку, щоб не маратися з __getstate__
+        book.count_for_print = 0
 # Створення нової адресної книги, якщо не було файлу
     except FileNotFoundError:
         book = AddressBook()
@@ -215,23 +197,21 @@ if __name__ == "__main__":
 # Створення запису для John&Jane
     print ('-----Створення запису для John&Jane-----')
     jo_ja_record = Record("John&Jane")
-    jo_ja_record.add_phone("1234567890")
-    jo_ja_record.add_phone("5555555555")
+    jo_ja_record.add_phone("1236547890")
+    jo_ja_record.add_phone("6666666666")
     jo_ja_record.add_birthday("10.02.2025")
     book.add_record(jo_ja_record)
 
 # Створення запису для Jane&John
     print ('-----Створення запису для Jane&John-----')
     ja_jo_record = Record("Jane&John")
-    ja_jo_record.add_phone("1234567890")
-    ja_jo_record.add_phone("5555555555")
+    ja_jo_record.add_phone("9999999999")
+    ja_jo_record.add_phone("7777777777")
     ja_jo_record.add_birthday("10.12.2021")
     book.add_record(ja_jo_record)
 
-# Виведення всіх записів у книзі
-    print ('-----Виведення всіх записів у книзі-----')
-    print (book)
-    print (type(book))
+# Виведення всіх записів у книзі по сторінках
+    print ('-----Виведення всіх записів у книзі по сторінках-----')
     pages_to_print = PrintIterator(book)
     page = 1
     for records_on_page in pages_to_print: #book.data.items():
@@ -249,6 +229,14 @@ if __name__ == "__main__":
             input ('\nPress Enter for print next page\n')
         else:
             print (f'--- End of book ---')
+    print ('')
+
+# Виведення всіх записів у книзі, що відповідають пошуку
+    for_find = input ('Please enter symbols for find name and phone numbers in phone book: ')
+    print (f"-----Виведення всіх записів у книзі із рядком '{for_find}'-----")
+    for record in book.data.values():
+        if record.stringets.find (for_find) != -1:
+            print(record)
     print ('')
 
 # Знаходження та редагування телефону для John
@@ -272,27 +260,5 @@ if __name__ == "__main__":
 #    print (jane22, '- found jane22')
 
 # Записуємо творчість у файл перед закінченням роботи
-    print ("-----Записуємо творчість у файл перед закінченням роботи-----")
     with open ('phonebook.bin', 'wb') as file:
         pickle.dump (book, file)
-#        file.write (one_record)
-#        file.write (b'\n')
-#        with open ('phonebook.bin', 'rb') as file:
-#            file_readed = pickle.load (file)
-#            print (f'from pickle: {file_readed}')
-#            print (f'as lines: {file.readlines()}')
-#            file.seek(0)
-#            phonebook_readed = {}
-#            while True:
-#                line_ = file.readline()
-#                line = pickle.loads (line_[:-1])
-#                print (f'line: {line}')
-#                if line:
-#                    phonebook_readed.update (line)
-#                else: break
-#            print (f'as file: {phonebook_readed}')
-# without file
-#{'John': <__main__.Record object at 0x000002B9EE9F8610>,
-#'Jane': <__main__.Record object at 0x000002B9EEF25490>, 
-#'John&Jane': <__main__.Record object at 0x000002B9EEF910D0>, 
-#'Jane&John': <__main__.Record object at 0x000002B9EEF902D0>}
